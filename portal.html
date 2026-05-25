@@ -1,1 +1,850 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chigalex1 — Africa Pi Network Education Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--pi:#7B2FBE;--pi-light:#9B5DE5;--pi-glow:#C77DFF;--gold:#F4C430;--gold-dark:#C9A020;--dark:#0D0D1A;--dark2:#13132A;--dark3:#1C1C38;--text:#E8E8F0;--muted:#8888AA;--green:#2ECC71;--red:#E74C3C;--border:rgba(123,47,190,0.3);--africa:#E8701A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 80% 10%,rgba(123,47,190,0.18) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 80%,rgba(232,112,26,0.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.container{max-width:880px;margin:0 auto;padding:0 18px 60px;position:relative;z-index:1;}
+
+/* LOCK SCREEN */
+#lock-screen{position:fixed;inset:0;background:var(--dark);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;overflow-y:auto;}
+#lock-screen.hidden{display:none;}
+.lock-logo{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1a0a2e,#2a1050);border:1px solid rgba(199,125,255,0.3);border-radius:16px;padding:10px 20px;margin-bottom:20px;}
+.lock-pi{font-size:26px;font-weight:800;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--pi-glow),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.lock-name-main{font-size:13px;font-weight:800;color:white;text-align:left;}
+.lock-name-sub{font-size:9px;color:var(--africa);letter-spacing:1.2px;text-transform:uppercase;font-family:'Space Mono',monospace;}
+.lock-icon{font-size:52px;margin-bottom:14px;}
+.lock-title{font-size:22px;font-weight:800;color:white;margin-bottom:8px;}
+.lock-desc{font-size:13px;color:var(--muted);max-width:360px;line-height:1.7;margin-bottom:24px;}
+.lock-box{background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:380px;}
+.lock-box label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:7px;letter-spacing:1px;text-transform:uppercase;}
+.lock-input{width:100%;background:var(--dark3);border:2px solid var(--border);border-radius:10px;padding:13px 16px;color:white;font-family:'Space Mono',monospace;font-size:16px;text-align:center;letter-spacing:3px;outline:none;margin-bottom:10px;transition:border-color 0.2s;}
+.lock-input:focus{border-color:var(--pi-light);}
+.lock-input.error{border-color:var(--red);animation:shake 0.3s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.btn-unlock{width:100%;padding:13px;background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:all 0.25s;margin-bottom:10px;}
+.btn-unlock:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(123,47,190,0.4);}
+.lock-error{color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:4px;}
+.lock-contact{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6;}
+.lock-contact a{color:var(--pi-glow);}
+.admin-link{margin-top:16px;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;}
+
+/* ADMIN PANEL */
+#admin-screen{position:fixed;inset:0;background:var(--dark);z-index:9998;display:none;overflow-y:auto;padding:20px;}
+#admin-screen.show{display:block;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;max-width:820px;margin-left:auto;margin-right:auto;}
+.admin-title{font-size:18px;font-weight:800;color:white;}
+.admin-subtitle{font-size:11px;color:var(--africa);font-family:'Space Mono',monospace;letter-spacing:1px;}
+.btn-close-admin{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red);border-radius:10px;padding:7px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
+.admin-inner{max-width:820px;margin:0 auto;}
+.admin-section{background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:14px;}
+.admin-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;color:var(--pi-glow);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+.code-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
+.code-item{display:flex;align-items:center;gap:9px;background:var(--dark3);border-radius:9px;padding:9px 13px;}
+.code-val{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--pi-glow);flex:1;letter-spacing:2px;}
+.code-used{font-size:10px;padding:2px 8px;border-radius:11px;font-weight:600;}
+.code-used.active{background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.25);color:var(--green);}
+.code-used.used{background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.25);color:var(--red);}
+.btn-del{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+.add-code-row{display:flex;gap:9px;flex-wrap:wrap;}
+.add-code-row input{flex:1;min-width:130px;background:var(--dark3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;outline:none;}
+.add-code-row input:focus{border-color:var(--pi-light);}
+.btn-gen{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0D0D1A;border:none;border-radius:9px;padding:9px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;}
+.btn-add-code{background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;border:none;border-radius:9px;padding:9px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;}
+.module-item{background:var(--dark3);border:1px solid var(--border);border-radius:11px;padding:13px 15px;margin-bottom:9px;}
+.module-top{display:flex;align-items:center;gap:9px;margin-bottom:7px;flex-wrap:wrap;}
+.module-cat{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;background:rgba(123,47,190,0.15);border:1px solid rgba(123,47,190,0.3);color:var(--pi-glow);}
+.module-title-disp{font-size:13px;font-weight:700;color:white;flex:1;}
+.module-desc-disp{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:7px;}
+.module-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.btn-edit-mod{background:rgba(123,47,190,0.15);border:1px solid rgba(123,47,190,0.3);color:var(--pi-glow);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+.add-module-form{background:var(--dark3);border:1px dashed rgba(123,47,190,0.4);border-radius:11px;padding:14px;margin-bottom:12px;}
+.add-module-form h4{font-size:10px;color:var(--pi-glow);font-weight:700;margin-bottom:11px;text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace;}
+.fg{margin-bottom:9px;}
+.fg label{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--dark2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'Syne',sans-serif;font-size:12.5px;outline:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--pi-light);}
+.fg textarea{resize:vertical;min-height:65px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+@media(max-width:480px){.fg-row{grid-template-columns:1fr;}}
+
+/* LANG BAR */
+.lang-bar{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
+.lang-btn{background:var(--dark2);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:4px 11px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s;}
+.lang-btn.active{background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;border-color:transparent;}
+.lang-btn:hover:not(.active){color:var(--text);}
+
+/* HEADER */
+header{text-align:center;padding:32px 16px 18px;}
+.hub-logo{display:inline-flex;align-items:center;gap:11px;background:linear-gradient(135deg,#1a0a2e,#2a1050);border:1px solid rgba(199,125,255,0.3);border-radius:16px;padding:9px 18px;margin-bottom:14px;}
+.hub-pi{font-size:26px;font-weight:800;font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--pi-glow),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hub-text{text-align:left;}
+.hub-name{font-size:12px;font-weight:800;color:white;}
+.hub-sub{font-size:9px;color:var(--africa);letter-spacing:1.2px;text-transform:uppercase;font-family:'Space Mono',monospace;}
+h1{font-size:clamp(20px,5vw,36px);font-weight:800;line-height:1.15;background:linear-gradient(135deg,#fff 30%,var(--pi-glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:7px;}
+.subtitle{color:var(--muted);font-size:13px;max-width:500px;margin:0 auto 12px;line-height:1.6;}
+.ref-banner{background:linear-gradient(135deg,rgba(244,196,48,0.12),rgba(232,112,26,0.10));border:1px solid rgba(244,196,48,0.35);border-radius:13px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:11px;flex-wrap:wrap;}
+.ref-icon{font-size:24px;flex-shrink:0;}
+.ref-body{flex:1;min-width:160px;}
+.ref-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-family:'Space Mono',monospace;margin-bottom:2px;}
+.ref-code{font-size:19px;font-weight:800;color:white;font-family:'Space Mono',monospace;letter-spacing:2px;}
+.ref-note{font-size:11px;color:var(--muted);margin-top:2px;}
+.btn-copy{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0D0D1A;border:none;border-radius:9px;padding:8px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.acc-banner{background:linear-gradient(135deg,rgba(46,204,113,0.10),rgba(123,47,190,0.10));border:1px solid rgba(46,204,113,0.3);border-radius:13px;padding:13px 16px;margin-bottom:16px;display:flex;gap:11px;align-items:flex-start;}
+.acc-icon{font-size:22px;flex-shrink:0;}
+.acc-body{flex:1;}
+.acc-title{font-size:13.5px;font-weight:700;color:white;margin-bottom:3px;}
+.acc-desc{font-size:12px;color:#AAAACC;line-height:1.6;}
+.acc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.badge{font-size:10px;padding:2px 8px;border-radius:18px;font-weight:600;background:rgba(46,204,113,0.15);border:1px solid rgba(46,204,113,0.3);color:var(--green);}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--dark2);border:1px solid var(--border);border-radius:13px;padding:4px;margin:0 0 22px;flex-wrap:wrap;}
+.tab{flex:1;min-width:65px;padding:8px 5px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:10.5px;cursor:pointer;transition:all 0.25s;text-align:center;}
+.tab.active{background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;}
+.tab:hover:not(.active){color:var(--text);background:var(--dark3);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--dark2);border:1px solid var(--border);border-radius:15px;padding:22px;margin-bottom:12px;}
+.card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:13px;}
+.step-num{min-width:33px;height:33px;border-radius:9px;background:linear-gradient(135deg,var(--pi),var(--pi-light));display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
+.step-title{font-size:14px;font-weight:700;color:white;margin-bottom:2px;}
+.step-subtitle{font-size:11px;color:var(--muted);}
+.step-body{font-size:12.5px;line-height:1.75;color:#CCCCDD;}
+.tip-box{background:rgba(244,196,48,0.08);border:1px solid rgba(244,196,48,0.25);border-radius:9px;padding:9px 12px;margin-top:10px;font-size:12px;color:var(--gold);display:flex;gap:8px;align-items:flex-start;}
+.success-box{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);border-radius:9px;padding:9px 12px;margin-top:10px;font-size:12px;color:var(--green);display:flex;gap:8px;align-items:flex-start;}
+.track-box{background:rgba(123,47,190,0.10);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-top:10px;font-size:12px;color:var(--pi-glow);}
+.fsect{margin-bottom:18px;}
+.fsect-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;color:var(--pi-glow);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.frow{grid-template-columns:1fr;}}
+.fgrp{margin-bottom:10px;}
+.fgrp label{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:0.5px;text-transform:uppercase;}
+.fgrp input,.fgrp select,.fgrp textarea{width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+.fgrp input:focus,.fgrp select:focus,.fgrp textarea:focus{border-color:var(--pi-light);}
+.fgrp textarea{resize:vertical;min-height:68px;}
+.rgroup{display:flex;gap:7px;flex-wrap:wrap;}
+.ropt{flex:1;min-width:95px;}
+.ropt input[type="radio"]{display:none;}
+.ropt label{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 9px;border-radius:9px;border:2px solid var(--border);background:var(--dark3);cursor:pointer;text-transform:none;font-size:11.5px;font-weight:600;color:var(--muted);transition:all 0.2s;letter-spacing:0;}
+.ropt input[type="radio"]:checked+label{border-color:var(--pi-light);background:rgba(123,47,190,0.15);color:white;}
+.cond{display:none;}
+.cond.show{display:block;animation:fadeIn 0.25s ease;}
+.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;border:none;border-radius:11px;cursor:pointer;transition:all 0.25s;margin-top:7px;}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(123,47,190,0.4);}
+.sscreen{display:none;text-align:center;padding:30px 12px;}
+.sscreen.show{display:block;animation:fadeIn 0.4s ease;}
+.sscreen h2{font-size:21px;font-weight:800;color:white;margin-bottom:7px;}
+.sscreen p{color:var(--muted);font-size:13px;line-height:1.6;max-width:360px;margin:0 auto 18px;}
+.nsteps{background:var(--dark3);border:1px solid var(--border);border-radius:13px;padding:14px;text-align:left;max-width:400px;margin:0 auto;}
+.nsteps h3{font-size:10px;font-weight:700;color:var(--pi-glow);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;font-family:'Space Mono',monospace;}
+.nsi{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:12px;color:#CCCCDD;line-height:1.5;}
+.nsn{min-width:19px;height:19px;border-radius:50%;background:var(--pi);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;margin-top:1px;}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(max-width:480px){.tracks{grid-template-columns:1fr;}}
+.tc{border-radius:13px;padding:16px;border:2px solid;}
+.tc.pi-t{background:rgba(123,47,190,0.10);border-color:rgba(123,47,190,0.4);}
+.tc.fi-t{background:rgba(244,196,48,0.06);border-color:rgba(244,196,48,0.3);}
+.tlab{font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:6px;}
+.tc.pi-t .tlab{color:var(--pi-glow);}
+.tc.fi-t .tlab{color:var(--gold);}
+.ttitle{font-size:13.5px;font-weight:700;color:white;margin-bottom:6px;}
+.tsteps{list-style:none;font-size:11.5px;color:#CCCCDD;line-height:2;}
+.tsteps li::before{content:"→ ";color:var(--muted);}
+.pmlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.pmi{background:var(--dark3);border:1px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.pmflag{font-size:19px;flex-shrink:0;}
+.pminfo{flex:1;}
+.pmname{font-size:13px;font-weight:700;color:white;}
+.pmcountry{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:2px;}
+.pmnumber{font-size:11px;color:var(--pi-glow);margin-top:2px;font-family:'Space Mono',monospace;}
+.btn-remove{background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:var(--red);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+.addpm{background:var(--dark3);border:1px dashed rgba(123,47,190,0.4);border-radius:11px;padding:13px;margin-bottom:12px;}
+.addpm h4{font-size:10px;color:var(--pi-glow);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;font-family:'Space Mono',monospace;}
+.addrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+@media(max-width:480px){.addrow{grid-template-columns:1fr;}}
+.addrow input{background:var(--dark2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'Syne',sans-serif;font-size:12.5px;outline:none;width:100%;}
+.addrow input:focus{border-color:var(--pi-light);}
+.btn-add{background:linear-gradient(135deg,var(--pi),var(--pi-light));color:white;border:none;border-radius:9px;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:12.5px;cursor:pointer;}
+.hstep{display:flex;gap:11px;align-items:flex-start;padding:11px;background:var(--dark3);border-radius:10px;margin-bottom:8px;}
+.hnum{min-width:25px;height:25px;border-radius:7px;background:linear-gradient(135deg,var(--africa),var(--gold));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.hbody{font-size:12.5px;color:#CCCCDD;line-height:1.6;}
+.hbody strong{color:white;}
+.codeblk{background:#0a0a18;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--pi-glow);margin-top:6px;word-break:break-all;}
+.cklist{list-style:none;margin-top:8px;}
+.cklist li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#CCCCDD;line-height:1.6;margin-bottom:6px;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:7px;}
+.atier{background:var(--dark3);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:9px;display:flex;gap:11px;align-items:flex-start;}
+.aticon{font-size:21px;flex-shrink:0;}
+.atitle{font-size:13px;font-weight:700;color:white;margin-bottom:3px;}
+.adesc{font-size:12px;color:var(--muted);line-height:1.6;}
+.aperks{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.perk{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.perk.g{background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.25);color:var(--green);}
+.perk.p{background:rgba(123,47,190,0.15);border:1px solid rgba(123,47,190,0.3);color:var(--pi-glow);}
+.mcard{background:var(--dark2);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:10px;}
+.mcard-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.micon{font-size:22px;flex-shrink:0;}
+.mcat{font-size:10px;padding:2px 8px;border-radius:9px;font-weight:600;background:rgba(123,47,190,0.15);border:1px solid rgba(123,47,190,0.3);color:var(--pi-glow);margin-bottom:4px;display:inline-block;}
+.mtitle{font-size:13.5px;font-weight:700;color:white;margin-bottom:2px;}
+.mdesc{font-size:12px;color:var(--muted);line-height:1.6;}
+.footer-note{text-align:center;margin-top:24px;font-size:10.5px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.8;}
+.hl{color:var(--pi-glow);font-weight:600;}
+.hla{color:var(--africa);font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="lock-logo">
+    <div class="lock-pi">&#960;</div>
+    <div>
+      <div class="lock-name-main">Chigalex1</div>
+      <div class="lock-name-sub">Africa Pi Network Education Hub External</div>
+    </div>
+  </div>
+  <div class="lock-icon">&#128274;</div>
+  <div class="lock-title" id="lt">Training Portal Access</div>
+  <div class="lock-desc" id="ld">This portal is for registered and paid pioneers only. Enter your unique access code provided by Alexander after payment confirmation.</div>
+  <div class="lock-box">
+    <label id="ll">Your Access Code</label>
+    <input class="lock-input" id="code-input" type="text" placeholder="CHG-XXXXXX" maxlength="14" autocomplete="off" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <div class="lock-error" id="lock-err"></div>
+    <button class="btn-unlock" id="lu" onclick="tryUnlock()">&#128275; Unlock Portal</button>
+    <div class="lock-contact" id="lc">No code yet? Complete payment and WhatsApp Alexander:<br><a href="https://wa.me/263772951579">+263 772 951 579</a></div>
+  </div>
+  <div class="admin-link" onclick="showAdminLogin()" id="al">Trainer Admin Access</div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="admin-screen">
+  <div class="admin-inner">
+    <div class="admin-header">
+      <div><div class="admin-title">&#9881;&#65039; Chigalex1 Admin Panel</div><div class="admin-subtitle">Alexander Tafira Chigodo &mdash; Trainer Controls</div></div>
+      <button class="btn-close-admin" onclick="closeAdmin()">&#10005; Close</button>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">&#128273; Access Code Manager</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Generate a unique code for each pioneer after payment. Share via WhatsApp. Used codes are marked automatically.</p>
+      <div class="code-list" id="code-list"></div>
+      <div class="add-code-row">
+        <input type="text" id="new-code-input" placeholder="e.g. CHG-TENDAI" maxlength="16">
+        <button class="btn-gen" onclick="generateCode()">&#9889; Auto Generate</button>
+        <button class="btn-add-code" onclick="addCode()">&#43; Add Code</button>
+      </div>
+      <div style="margin-top:9px;font-size:11.5px;color:var(--muted);">Tip: Use pioneer's name e.g. <span style="color:var(--pi-glow);font-family:'Space Mono',monospace;">CHG-KWAME</span></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">&#128218; Training Module Manager</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Add, edit or remove modules anytime. Changes appear instantly for all logged-in pioneers.</p>
+      <div id="admin-module-list"></div>
+      <div class="add-module-form">
+        <h4 id="mod-form-title">&#43; Add New Module</h4>
+        <input type="hidden" id="edit-mod-index" value="-1">
+        <div class="fg-row">
+          <div class="fg"><label>Module Title</label><input type="text" id="mod-title" placeholder="e.g. MapOfPi Onboarding"></div>
+          <div class="fg"><label>Category</label>
+            <select id="mod-cat">
+              <option>Foundational Training</option><option>KYC &amp; Wallet</option><option>Hub Ecosystem</option>
+              <option>MapOfPi</option><option>Pi Commerce</option><option>Team Building</option><option>Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg-row">
+          <div class="fg"><label>Icon (emoji)</label><input type="text" id="mod-icon" placeholder="&#128205;"></div>
+          <div class="fg"><label>Status</label>
+            <select id="mod-status"><option>Available Now</option><option>Coming Soon</option><option>Updated</option></select>
+          </div>
+        </div>
+        <div class="fg"><label>Description</label><textarea id="mod-desc" placeholder="What will pioneers learn..."></textarea></div>
+        <div class="fg"><label>Content Link (optional)</label><input type="text" id="mod-link" placeholder="Paste a URL or leave blank"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+          <button class="btn-add-code" onclick="saveModule()">&#128190; Save Module</button>
+          <button style="background:var(--dark2);border:1px solid var(--border);color:var(--muted);border-radius:9px;padding:8px 14px;font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">&#128274; Admin Password</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div class="fg" style="flex:1;min-width:150px;margin:0;"><label>New Admin Password</label><input type="password" id="new-admin-pw" placeholder="Enter new password"></div>
+        <button class="btn-add-code" onclick="changeAdminPw()" style="margin-bottom:0;">Update</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Default: <span style="color:var(--pi-glow);font-family:'Space Mono',monospace;">Chigalex@Admin1</span> &mdash; change after first login.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN PORTAL -->
+<div class="container" id="main-portal" style="display:none;">
+
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('en',this)">&#127468;&#127463; EN</button>
+    <button class="lang-btn" onclick="setLang('sn',this)">&#127487;&#127484; Shona</button>
+    <button class="lang-btn" onclick="setLang('nd',this)">&#127487;&#127484; Ndebele</button>
+    <button class="lang-btn" onclick="setLang('sw',this)">&#127757; Swahili</button>
+    <button class="lang-btn" onclick="setLang('fr',this)">&#127467;&#127479; Fran&#231;ais</button>
+    <button class="lang-btn" onclick="setLang('pt',this)">&#127477;&#127481; Portugu&#234;s</button>
+    <button class="lang-btn" onclick="setLang('zu',this)">&#127487;&#127462; Zulu</button>
+    <button class="lang-btn" onclick="setLang('ha',this)">&#127475;&#127468; Hausa</button>
+  </div>
+
+  <header>
+    <div class="hub-logo">
+      <div class="hub-pi">&#960;</div>
+      <div class="hub-text">
+        <div class="hub-name">Chigalex1</div>
+        <div class="hub-sub">Africa Pi Network Education Hub External</div>
+      </div>
+    </div>
+    <h1 id="h1t">Pioneer Training &amp; Education Portal</h1>
+    <p class="subtitle">Hosted by <strong style="-webkit-text-fill-color:var(--pi-glow);color:var(--pi-glow);">Alexander Tafira Chigodo</strong> &mdash; <span id="h1s">Empowering African Pioneers to unlock, use and grow in the Pi ecosystem.</span></p>
+  </header>
+
+  <div class="ref-banner">
+    <div class="ref-icon">&#128279;</div>
+    <div class="ref-body">
+      <div class="ref-label" id="rlab">Pi Referral / Invitation Code</div>
+      <div class="ref-code">Chigalex1</div>
+      <div class="ref-note" id="rnote">New to Pi Network? Use this code when signing up to join Alexander's pioneer team.</div>
+    </div>
+    <button class="btn-copy" onclick="copyRef()" id="rbtn">&#128203; Copy Code</button>
+  </div>
+
+  <div class="acc-banner">
+    <div class="acc-icon">&#127891;</div>
+    <div class="acc-body">
+      <div class="acc-title" id="abt">Complete the Training &#8594; Unlock the Full Hub</div>
+      <div class="acc-desc" id="abd">Every pioneer who completes the Chigalex1 training automatically unlocks free access to all further Hub trainings. Your US$10 is a one-time investment &mdash; everything after is free.</div>
+      <div class="acc-badges">
+        <span class="badge">&#10003; MapOfPi</span>
+        <span class="badge">&#10003; Ecosystem Trainings</span>
+        <span class="badge">&#10003; Hub Community</span>
+        <span class="badge">&#10003; All Future Modules</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('register')" id="tab-register">&#128203; Register</button>
+    <button class="tab" onclick="switchTab('training')" id="tab-training">&#128218; Training</button>
+    <button class="tab" onclick="switchTab('kyc')" id="tab-kyc">&#128274; KYC Guide</button>
+    <button class="tab" onclick="switchTab('payment')" id="tab-payment">&#128179; Payment</button>
+    <button class="tab" onclick="switchTab('access')" id="tab-access">&#127891; Hub Access</button>
+    <button class="tab" onclick="switchTab('hosting')" id="tab-hosting">&#127760; Get Link</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="panel active" id="panel-register">
+    <div class="card">
+      <div id="form-body">
+        <div class="fsect">
+          <div class="fsect-title" id="fp1">Personal Information</div>
+          <div class="frow">
+            <div class="fgrp"><label id="lf">First Name</label><input type="text" id="fname" placeholder="e.g. Tendai"></div>
+            <div class="fgrp"><label id="ll2">Last Name</label><input type="text" id="lname" placeholder="e.g. Moyo"></div>
+          </div>
+          <div class="frow">
+            <div class="fgrp"><label id="lph">Phone (WhatsApp)</label><input type="tel" id="phone" placeholder="+263 XX XXX XXXX"></div>
+            <div class="fgrp"><label id="lco">Country</label>
+              <select id="country">
+                <option value="">Select...</option>
+                <option>Zimbabwe</option><option>Zambia</option><option>Nigeria</option><option>Kenya</option>
+                <option>Ghana</option><option>Uganda</option><option>Tanzania</option><option>South Africa</option>
+                <option>Malawi</option><option>Mozambique</option><option>Botswana</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="fgrp"><label id="lpu">Pi Network Username</label><input type="text" id="piuser" placeholder="@username"></div>
+          <div class="fgrp"><label id="lref">Who referred you?</label><input type="text" id="referrer" placeholder="Leave blank if you used code Chigalex1"></div>
+        </div>
+        <div class="fsect">
+          <div class="fsect-title" id="fp2">KYC &amp; Wallet Status</div>
+          <div class="fgrp"><label id="lky">Have you completed KYC?</label>
+            <div class="rgroup">
+              <div class="ropt"><input type="radio" name="kyc" id="kyc-yes" value="yes" onchange="handleKYC(this)"><label for="kyc-yes">&#10003; <span id="ky1">Yes</span></label></div>
+              <div class="ropt"><input type="radio" name="kyc" id="kyc-no" value="no" onchange="handleKYC(this)"><label for="kyc-no">&#10007; <span id="ky2">Not yet</span></label></div>
+              <div class="ropt"><input type="radio" name="kyc" id="kyc-pending" value="pending" onchange="handleKYC(this)"><label for="kyc-pending">&#8987; <span id="ky3">Pending</span></label></div>
+            </div>
+          </div>
+          <div class="cond" id="wallet-section">
+            <div class="fgrp"><label id="lwal">Pi Mainnet Wallet Address (G...)</label><input type="text" id="wallet" placeholder="GABCD..."></div>
+            <div class="success-box"><span>&#10003;</span><span id="wmsg">Great &mdash; you can pay in Pi directly. Once you complete training, all further Hub modules unlock at no extra cost.</span></div>
+          </div>
+        </div>
+        <div class="fsect">
+          <div class="fsect-title" id="fp3">Training &amp; Payment</div>
+          <div class="fgrp"><label id="llv">Training Level</label>
+            <select id="level">
+              <option value="" id="lv0">Select level...</option>
+              <option id="lv1">Beginner &mdash; New to Pi Network</option>
+              <option id="lv2">Intermediate &mdash; Mining but not on Mainnet</option>
+              <option id="lv3">Advanced &mdash; On Mainnet, ready for ecosystem</option>
+            </select>
+          </div>
+          <div class="fgrp"><label id="lpm">Preferred Payment Method</label>
+            <div class="rgroup">
+              <div class="ropt"><input type="radio" name="pay" id="pay-pi" value="pi" onchange="handlePay(this)"><label for="pay-pi">&#128995; <span id="pp1">Pay in Pi</span></label></div>
+              <div class="ropt"><input type="radio" name="pay" id="pay-mobile" value="mobile" onchange="handlePay(this)"><label for="pay-mobile">&#128993; <span id="pp2">Mobile Money</span></label></div>
+              <div class="ropt"><input type="radio" name="pay" id="pay-sponsor" value="sponsor" onchange="handlePay(this)"><label for="pay-sponsor">&#129309; <span id="pp3">Sponsored</span></label></div>
+            </div>
+          </div>
+          <div class="cond" id="pay-pi-info">
+            <div class="track-box" style="line-height:1.9;">
+              &#128156; <strong id="ppit">Send Pi to either wallet:</strong><br><br>
+              <span style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">CHIGALEX1 APP WALLET</span><br>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;word-break:break-all;color:white;">GABWRTXUPYTRO7RBCMIPKP55UZ6LKVPSX2NOMXXFBFOOZEFQTKJSGZ7J</span><br><br>
+              <span style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;">PERSONAL WALLET &mdash; Alexander Tafira Chigodo</span><br>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;word-break:break-all;color:white;">GC6FWGDBE2GPI3PJFYPCQ5PIF32VYQHAED44KUWPBKJTPBT4QRTFLC7H</span><br><br>
+              <span id="ppnote">Screenshot &amp; send proof to +263 772 951 579.</span>
+            </div>
+          </div>
+          <div class="cond" id="pay-mobile-info">
+            <div class="tip-box"><span>&#128241;</span><span id="ppmob">Send to +263 772 951 579 (Alexander). Use your Pi username as reference. Always confirm exact amount first.</span></div>
+          </div>
+          <div class="cond" id="pay-sponsor-info">
+            <div class="fgrp" style="margin-top:10px;"><label id="lspon">Sponsor's Pi Username</label><input type="text" id="sponsor" placeholder="@sponsor_name"></div>
+          </div>
+          <div class="tip-box" style="margin-top:10px;"><span>&#127891;</span><span id="otmsg">Once you complete training, you automatically unlock free access to all further Hub trainings. Your US$10 is a one-time investment.</span></div>
+        </div>
+        <div class="fsect">
+          <div class="fsect-title" id="fp4">Additional Info</div>
+          <div class="fgrp"><label id="lsrc">How did you hear about us?</label>
+            <select id="source"><option value="">Select...</option><option>WhatsApp Group</option><option>Referred by a Pioneer</option><option>Telegram</option><option>Facebook</option><option>Twitter / X</option><option>Pi Network Community</option><option>Other</option></select>
+          </div>
+          <div class="fgrp"><label id="lnts">Questions or notes? (Optional)</label><textarea id="notes" placeholder="Anything you want Alexander to know..."></textarea></div>
+        </div>
+        <button class="btn-submit" onclick="submitForm()" id="bsub">Submit Registration &#8594;</button>
+      </div>
+      <div class="sscreen" id="success-screen">
+        <div style="font-size:48px;margin-bottom:12px;">&#127881;</div>
+        <h2 id="sst">Welcome to the Hub, Pioneer!</h2>
+        <p id="ssd">Your registration has been received. Alexander will confirm your spot within 24 hours via WhatsApp.</p>
+        <div class="nsteps">
+          <h3 id="ssn">Your Next Steps</h3>
+          <div class="nsi"><div class="nsn">1</div><span id="ss1">Complete your payment &mdash; check the Payment tab.</span></div>
+          <div class="nsi"><div class="nsn">2</div><span id="ss2">Haven't done KYC? Go to the KYC Guide tab.</span></div>
+          <div class="nsi"><div class="nsn">3</div><span id="ss3">New to Pi? Use referral code <strong style="color:var(--pi-glow);">Chigalex1</strong>.</span></div>
+          <div class="nsi"><div class="nsn">4</div><span id="ss4">Wait for Alexander's confirmation: +263 772 951 579.</span></div>
+          <div class="nsi"><div class="nsn">5</div><span id="ss5">Once confirmed &mdash; welcome to the Hub! &#128640;</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="panel" id="panel-training">
+    <div class="card" style="background:rgba(123,47,190,0.08);border-color:rgba(123,47,190,0.3);margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;" id="tmt">&#128218; Training Modules</div>
+      <div style="font-size:12.5px;color:#AAAACC;line-height:1.6;" id="tmd">All available training modules from Alexander. New content is added regularly. Modules marked Updated contain the latest materials.</div>
+    </div>
+    <div id="modules-display"></div>
+  </div>
+
+  <!-- KYC -->
+  <div class="panel" id="panel-kyc">
+    <div class="card" style="background:rgba(46,204,113,0.06);border-color:rgba(46,204,113,0.2);margin-bottom:12px;">
+      <div style="display:flex;gap:11px;align-items:center;">
+        <div style="font-size:26px;">&#128274;</div>
+        <div><div style="font-size:14px;font-weight:700;color:white;margin-bottom:3px;" id="kwt">Why KYC Matters</div>
+        <div style="font-size:12.5px;color:#AAAACC;line-height:1.6;" id="kwd">KYC unlocks your Pi mainnet wallet. Without it, your mined Pi stays locked. Complete the Chigalex1 training and gain access to all further Hub modules at no extra cost.</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="step-num">1</div><div><div class="step-title">Open the Pi App</div><div class="step-subtitle">Required first step</div></div></div><div class="step-body">Open your Pi Network app. Tap the menu (&#9776;) and select "KYC". This opens the Pi Browser where verification happens. Make sure you have a stable internet connection.</div><div class="tip-box"><span>&#128161;</span><span>If you don't see KYC yet, check the Pi Wallet app for Fast Track KYC &mdash; available to many new pioneers without waiting.</span></div></div>
+    <div class="card"><div class="card-header"><div class="step-num">2</div><div><div class="step-title">Use Fast Track KYC</div><div class="step-subtitle">Quickest route &mdash; recommended</div></div></div><div class="step-body">Open the Pi Wallet app. Look for "Fast Track KYC". Tap it &mdash; this lets you verify and activate your mainnet wallet without waiting for 30 mining sessions.</div><div class="success-box"><span>&#10003;</span><span>Fast Track is AI-powered and usually gives results within hours. Recommended for all Chigalex1 Hub trainees.</span></div></div>
+    <div class="card"><div class="card-header"><div class="step-num">3</div><div><div class="step-title">Prepare Your Documents</div><div class="step-subtitle">Get these ready before starting</div></div></div><div class="step-body">Have the following before tapping "Start KYC":</div>
+    <ul class="cklist">
+      <li><span>&#128196;</span><span>National ID, Passport or Driver's License &mdash; valid, not expired</span></li>
+      <li><span>&#128248;</span><span>Clear photos of your document &mdash; front and back</span></li>
+      <li><span>&#129335;</span><span>Selfie / liveness check &mdash; short live photo or video</span></li>
+      <li><span>&#128161;</span><span>Good lighting &mdash; sit near a window, avoid shadows</span></li>
+      <li><span>&#128246;</span><span>Strong internet (WiFi preferred) &mdash; avoid upload failures</span></li>
+    </ul></div>
+    <div class="card"><div class="card-header"><div class="step-num">4</div><div><div class="step-title">Complete Verification</div><div class="step-subtitle">Follow each screen carefully</div></div></div><div class="step-body"><strong>&#9312; Enter your real name</strong> exactly as on your ID.<br><strong>&#9313; Upload your document</strong> &mdash; flat, no glare, all corners visible.<br><strong>&#9314; Take your selfie</strong> &mdash; look directly at camera, good light.<br><strong>&#9315; Submit</strong> and wait for processing.</div><div class="tip-box"><span>&#9888;&#65039;</span><span>Do NOT use a nickname. Name must exactly match your official document or application will be flagged as Tentative.</span></div></div>
+    <div class="card"><div class="card-header"><div class="step-num">5</div><div><div class="step-title">Understanding Your Status</div><div class="step-subtitle">What each result means</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px;">
+        <div style="background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:7px;padding:9px 11px;font-size:12px;"><strong style="color:var(--green);">&#10003; Approved</strong> &mdash; Verified! Proceed to set up your Mainnet wallet.</div>
+        <div style="background:rgba(244,196,48,0.08);border:1px solid rgba(244,196,48,0.2);border-radius:7px;padding:9px 11px;font-size:12px;"><strong style="color:var(--gold);">&#8987; Tentative</strong> &mdash; Extra verification needed. Complete liveness check, keep mining daily. This is NOT a rejection.</div>
+        <div style="background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:7px;padding:9px 11px;font-size:12px;"><strong style="color:var(--red);">&#10007; Rejected</strong> &mdash; Usually a name mismatch or blurry document. Resubmit with clearer photos.</div>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="step-num">6</div><div><div class="step-title">Activate Your Mainnet Wallet</div><div class="step-subtitle">After KYC is approved</div></div></div><div class="step-body"><strong>&#9312; Open Pi Wallet app</strong> and complete the Mainnet Checklist.<br><strong>&#9313; Write down your 24-word passphrase</strong> &mdash; store safely offline.<br><strong>&#9314; Your wallet address</strong> (starts with G...) is now active.<br><strong>&#9315; You can now pay for training in Pi!</strong></div><div class="success-box"><span>&#127891;</span><span>Wallet activated! Once you complete training, contact Alexander on +263 772 951 579 and all further Hub trainings unlock for free.</span></div></div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="panel" id="panel-payment">
+    <div class="tracks">
+      <div class="tc pi-t">
+        <div class="tlab">Track A</div>
+        <div class="ttitle">&#128995; Pay in Pi</div>
+        <ul class="tsteps">
+          <li>KYC must be complete</li><li>Open Pi Wallet app</li><li>Tap "Send"</li>
+          <li>Choose wallet below</li><li>Confirm &amp; send</li><li>Screenshot transaction</li><li>Send proof to trainer</li>
+        </ul>
+        <div style="margin-top:10px;font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;line-height:1.9;">
+          CHIGALEX1 APP:<br><span style="color:var(--pi-glow);word-break:break-all;">GABWRTXUPYTRO7RBCMIPKP55UZ6LKVPSX2NOMXXFBFOOZEFQTKJSGZ7J</span><br><br>
+          PERSONAL:<br><span style="color:var(--pi-glow);word-break:break-all;">GC6FWGDBE2GPI3PJFYPCQ5PIF32VYQHAED44KUWPBKJTPBT4QRTFLC7H</span>
+        </div>
+      </div>
+      <div class="tc fi-t">
+        <div class="tlab">Track B</div>
+        <div class="ttitle">&#128993; Mobile Money</div>
+        <ul class="tsteps">
+          <li>No KYC needed</li><li>Choose country below</li><li>Send to listed number</li>
+          <li>Pi username as reference</li><li>Screenshot confirmation</li><li>Send proof to trainer</li><li>Complete KYC after</li>
+        </ul>
+        <div style="margin-top:10px;font-size:11px;color:var(--gold);">&#9888; Always confirm exact amount with Alexander first.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:12px;">Training Fee</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:7px;color:var(--muted);font-weight:600;">Method</th>
+          <th style="text-align:left;padding:7px;color:var(--muted);font-weight:600;">Fee</th>
+          <th style="text-align:left;padding:7px;color:var(--muted);font-weight:600;">Notes</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:9px 7px;">&#128995; Pi</td><td style="padding:9px 7px;color:var(--pi-glow);font-weight:700;">Pi equiv. US$10</td><td style="padding:9px 7px;color:var(--muted);">Rate confirmed by trainer</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:9px 7px;">&#128993; Mobile Money</td><td style="padding:9px 7px;color:var(--gold);font-weight:700;">US$10 + fees</td><td style="padding:9px 7px;color:var(--muted);">Confirm exact amount first</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:9px 7px;">&#129309; Sponsored</td><td style="padding:9px 7px;color:var(--green);font-weight:700;">By sponsor</td><td style="padding:9px 7px;color:var(--muted);">Sponsor pays in Pi</td></tr>
+          <tr><td style="padding:9px 7px;">&#127891; Hub Further</td><td style="padding:9px 7px;color:var(--green);font-weight:700;">FREE</td><td style="padding:9px 7px;color:var(--muted);">After completing training</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-box" style="margin-top:11px;"><span>&#128204;</span><span>All fiat pricing may be adjusted. Always confirm with Alexander (+263 772 951 579) before sending.</span></div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:11px;">&#128241; Mobile Money Options by Country</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:11px;">Contact Alexander to confirm before sending.</p>
+      <div class="pmlist" id="pay-method-list"></div>
+      <div class="addpm">
+        <h4>&#43; Add a Payment Option</h4>
+        <div class="addrow"><input type="text" id="new-country" placeholder="Country e.g. Zambia"><input type="text" id="new-flag" placeholder="Flag &#127487;&#127484;"></div>
+        <div class="addrow"><input type="text" id="new-service" placeholder="Service e.g. MTN MoMo"><input type="text" id="new-number" placeholder="Number / Account"></div>
+        <button class="btn-add" onclick="addPayMethod()">Add Payment Option</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUB ACCESS -->
+  <div class="panel" id="panel-access">
+    <div class="card" style="background:linear-gradient(135deg,rgba(46,204,113,0.08),rgba(123,47,190,0.08));border-color:rgba(46,204,113,0.3);margin-bottom:12px;">
+      <div style="font-size:24px;margin-bottom:7px;">&#127891;</div>
+      <div style="font-size:16px;font-weight:800;color:white;margin-bottom:5px;" id="hubt">Africa Pi Network Education Hub</div>
+      <div style="font-size:12.5px;color:#AAAACC;line-height:1.7;" id="hubd">The Chigalex1 training is your entry point. Pay once, complete the training, and you automatically unlock the full education ecosystem &mdash; every further module, every advanced training, at no additional cost.</div>
+    </div>
+    <div class="atier">
+      <div class="aticon">&#128274;</div>
+      <div><div class="atitle" id="at1">Step 1 &mdash; Register &amp; Pay (US$10, one time)</div>
+      <div class="adesc" id="ad1">All pioneers pay the registration fee &mdash; whether new, unverified, or already on Mainnet. Pay in Pi or Mobile Money.</div>
+      <div class="aperks"><span class="perk p">Pi Network Basics</span><span class="perk p">KYC Walkthrough</span><span class="perk p">Wallet Setup</span><span class="perk p">Ecosystem Intro</span></div></div>
+    </div>
+    <div class="atier" style="border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.05);">
+      <div class="aticon">&#128640;</div>
+      <div><div class="atitle" id="at2">Step 2 &mdash; Complete Training &#8594; Full Hub Access (FREE)</div>
+      <div class="adesc" id="ad2">Once you complete the Chigalex1 training, Alexander grants you free access to ALL further Hub trainings. No extra payment ever.</div>
+      <div class="aperks"><span class="perk g">&#10003; MapOfPi</span><span class="perk g">&#10003; Pi Ecosystem</span><span class="perk g">&#10003; Pi Commerce</span><span class="perk g">&#10003; Team Building</span><span class="perk g">&#10003; All Future Modules</span><span class="perk g">&#10003; Hub Community</span></div></div>
+    </div>
+    <div class="card" style="margin-top:4px;">
+      <div class="fsect-title" style="margin-bottom:12px;">How to Claim Your Free Hub Access</div>
+      <div class="hstep"><div class="hnum">1</div><div class="hbody"><strong>Register and pay</strong> the US$10 training fee via Pi or Mobile Money.</div></div>
+      <div class="hstep"><div class="hnum">2</div><div class="hbody"><strong>Attend and complete</strong> the Chigalex1 Pioneer Training Programme.</div></div>
+      <div class="hstep"><div class="hnum">3</div><div class="hbody">Complete your <strong>KYC</strong> and activate your <strong>Pi Mainnet Wallet</strong> during or after training.</div></div>
+      <div class="hstep"><div class="hnum">4</div><div class="hbody">WhatsApp Alexander at <strong>+263 772 951 579</strong> confirming training completion.</div></div>
+      <div class="hstep"><div class="hnum">5</div><div class="hbody">You're in! &#128640; Access <strong>MapOfPi, Pi commerce, team building</strong> and all future content &mdash; free forever.</div></div>
+    </div>
+  </div>
+
+  <!-- GET LINK -->
+  <div class="panel" id="panel-hosting">
+    <div class="card" style="background:rgba(232,112,26,0.07);border-color:rgba(232,112,26,0.25);margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;">&#127760; How to Get a Shareable Link</div>
+      <div style="font-size:12.5px;color:#AAAACC;line-height:1.6;">To share this portal with pioneers, host the HTML file online. Here are 3 free options.</div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:11px;">Option 1 &mdash; Google Drive (Easiest, Start Today)</div>
+      <div class="hstep"><div class="hnum">1</div><div class="hbody">Go to <strong>drive.google.com</strong> and sign in.</div></div>
+      <div class="hstep"><div class="hnum">2</div><div class="hbody">Click <strong>"+ New" &#8594; "File upload"</strong> and select the HTML file.</div></div>
+      <div class="hstep"><div class="hnum">3</div><div class="hbody">Right-click &#8594; <strong>"Share" &#8594; "Anyone with the link"</strong> &#8594; Copy link.</div></div>
+      <div class="hstep"><div class="hnum">4</div><div class="hbody">Share that link in WhatsApp groups. Pioneers tap to open.</div></div>
+      <div class="tip-box" style="margin-top:4px;"><span>&#128161;</span><span>Best option to start right now. No setup required.</span></div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:11px;">Option 2 &mdash; GitHub Pages (Free Permanent Link)</div>
+      <div class="hstep"><div class="hnum">1</div><div class="hbody">Go to <strong>github.com</strong> and create a free account.</div></div>
+      <div class="hstep"><div class="hnum">2</div><div class="hbody">Create new repository <strong>chigalex1-hub</strong> (Public).</div></div>
+      <div class="hstep"><div class="hnum">3</div><div class="hbody">Upload HTML file renamed as <strong>index.html</strong>.</div></div>
+      <div class="hstep"><div class="hnum">4</div><div class="hbody">Go to Settings &#8594; Pages &#8594; Source: main. Your link:<div class="codeblk">https://YOUR-USERNAME.github.io/chigalex1-hub</div></div></div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:11px;">Option 3 &mdash; Send File Directly (WhatsApp / Telegram)</div>
+      <div class="hstep"><div class="hnum">1</div><div class="hbody">Download the HTML file to your phone.</div></div>
+      <div class="hstep"><div class="hnum">2</div><div class="hbody">In WhatsApp/Telegram tap &#128206; and send the file directly.</div></div>
+      <div class="hstep"><div class="hnum">3</div><div class="hbody">Pioneers receive it, tap it and open in their browser. Works offline after opening.</div></div>
+      <div class="tip-box" style="margin-top:4px;"><span>&#128161;</span><span>Best for pioneers with poor connectivity or low data.</span></div>
+    </div>
+    <div class="card">
+      <div class="fsect-title" style="margin-bottom:11px;">&#128203; WhatsApp Announcement</div>
+      <div id="ann-text" style="background:var(--dark3);border-radius:9px;padding:13px;font-size:12px;color:#CCCCDD;line-height:1.8;white-space:pre-wrap;word-break:break-word;font-family:'Space Mono',monospace;">&#127995; *CHIGALEX1 &mdash; AFRICA Pi NETWORK EDUCATION HUB* &#127995;
+
+Greetings Pioneers! &#128075;
+
+I am *Alexander Tafira Chigodo* inviting you to the official *Africa Pi Network Education Hub External* training portal.
+
+&#10003; What you will learn:
+&bull; Complete your KYC step by step
+&bull; Activate your Pi Mainnet wallet
+&bull; MapOfPi onboarding
+&bull; Pi ecosystem &amp; commerce
+&bull; Build your pioneer team
+
+&#128176; *Training Fee: US$10*
+&#128995; Pay in Pi | &#128993; Mobile Money | &#129309; Sponsorship available
+
+&#128279; Pi Referral Code: *Chigalex1*
+
+&#128203; Register here &#128073; [PASTE YOUR PORTAL LINK]
+
+&#128222; WhatsApp: *+263 772 951 579*
+
+No wallet yet? No problem &mdash; we guide you through everything. &#128640;
+
+#PiNetwork #Chigalex1 #AfricaPiHub #KYC</div>
+      <button class="btn-add" style="margin-top:10px;width:100%;" onclick="copyAnn()">&#128203; Copy Announcement</button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span style="font-size:17px;background:linear-gradient(135deg,var(--pi-glow),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800;font-family:'Space Mono',monospace;">&#960;</span><br>
+    <span class="hl">Chigalex1</span> &mdash; <span class="hla">Africa Pi Network Education Hub External</span><br>
+    Alexander Tafira Chigodo &nbsp;&bull;&nbsp; +263 772 951 579
+  </div>
+</div>
+
+<script>
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+
+var codes=load('chg_codes',[{code:'CHG-DEMO1',used:false},{code:'CHG-DEMO2',used:false}]);
+var adminPw=load('chg_admin_pw','Chigalex@Admin1');
+var modules=load('chg_modules',[
+  {icon:'&#128214;',cat:'Foundational Training',title:'Pi Network Basics',desc:'What is Pi Network, how mining works, the Pi roadmap, and why it matters for Africa.',status:'Available Now',link:''},
+  {icon:'&#128274;',cat:'KYC & Wallet',title:'KYC Step-by-Step',desc:'Complete walkthrough of the Pi KYC process including Fast Track KYC, document requirements and troubleshooting.',status:'Available Now',link:''},
+  {icon:'&#128188;',cat:'KYC & Wallet',title:'Mainnet Wallet Setup',desc:'How to activate your Pi Mainnet wallet, secure your 24-word passphrase and start transacting.',status:'Available Now',link:''},
+  {icon:'&#128205;',cat:'MapOfPi',title:'MapOfPi Onboarding',desc:'How to register your business on MapOfPi, list your Pi-accepting location and attract Pi customers.',status:'Available Now',link:''},
+  {icon:'&#128Shopping;',cat:'Pi Commerce',title:'Pi Commerce & Payments',desc:'How to accept Pi as payment, price your goods in Pi and integrate with Pi ecosystem apps.',status:'Coming Soon',link:''},
+  {icon:'&#128101;',cat:'Team Building',title:'Building Your Pioneer Team',desc:'How to grow your referral network, onboard new pioneers and build a strong Pi community.',status:'Available Now',link:''},
+  {icon:'&#127760;',cat:'Hub Ecosystem',title:'Africa Pi Hub Ecosystem Overview',desc:'Full overview of all Hub resources, advanced training pathways and how to maximise your Pi ecosystem participation.',status:'Updated',link:''},
+]);
+var payMethods=load('chg_pay',[
+  {flag:'&#127487;&#127484;',country:'Zimbabwe',service:'EcoCash',number:'+263 772 951 579'},
+  {flag:'&#127487;&#127474;',country:'Zambia',service:'MTN MoMo / Airtel Money',number:'Confirm with Alexander'},
+  {flag:'&#127487;&#127462;',country:'South Africa',service:'FNB eWallet / SnapScan',number:'Confirm with Alexander'},
+  {flag:'&#127472;&#127466;',country:'Kenya',service:'M-Pesa',number:'Confirm with Alexander'},
+  {flag:'&#127475;&#127468;',country:'Nigeria',service:'OPay / Bank Transfer',number:'Confirm with Alexander'},
+  {flag:'&#127468;&#127469;',country:'Ghana',service:'MTN MoMo',number:'Confirm with Alexander'},
+  {flag:'&#127474;&#127487;',country:'Mozambique',service:'M-Pesa / mCel',number:'Confirm with Alexander'},
+  {flag:'&#127482;&#127468;',country:'Uganda',service:'MTN MoMo / Airtel Money',number:'Confirm with Alexander'},
+]);
+
+// LOCK
+function tryUnlock(){
+  var inp=document.getElementById('code-input').value.trim();
+  var err=document.getElementById('lock-err');
+  if(inp===adminPw){showAdmin();return;}
+  var idx=codes.findIndex(function(c){return c.code.toUpperCase()===inp.toUpperCase();});
+  if(idx===-1){err.textContent='Invalid code. Please check and try again.';var ci=document.getElementById('code-input');ci.classList.add('error');setTimeout(function(){ci.classList.remove('error');},400);return;}
+  codes[idx].used=true;store('chg_codes',codes);
+  document.getElementById('lock-screen').classList.add('hidden');
+  document.getElementById('main-portal').style.display='block';
+  err.textContent='';
+  renderModules();renderPayMethods();
+}
+
+function showAdminLogin(){
+  var pw=prompt('Enter admin password:');
+  if(pw===adminPw){showAdmin();}else if(pw!==null){alert('Incorrect password.');}
+}
+function showAdmin(){
+  document.getElementById('lock-screen').classList.add('hidden');
+  document.getElementById('admin-screen').classList.add('show');
+  renderCodes();renderAdminModules();
+}
+function closeAdmin(){
+  document.getElementById('admin-screen').classList.remove('show');
+  document.getElementById('lock-screen').classList.remove('hidden');
+}
+function changeAdminPw(){
+  var np=document.getElementById('new-admin-pw').value.trim();
+  if(!np){alert('Please enter a new password.');return;}
+  adminPw=np;store('chg_admin_pw',adminPw);
+  document.getElementById('new-admin-pw').value='';
+  alert('Admin password updated!');
+}
+function generateCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='CHG-';
+  for(var i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('new-code-input').value=code;
+}
+function addCode(){
+  var val=document.getElementById('new-code-input').value.trim().toUpperCase();
+  if(!val){alert('Enter or generate a code first.');return;}
+  if(codes.find(function(c){return c.code===val;})){alert('Code already exists.');return;}
+  codes.push({code:val,used:false});store('chg_codes',codes);
+  document.getElementById('new-code-input').value='';renderCodes();
+}
+function deleteCode(i){
+  if(!confirm('Delete code '+codes[i].code+'?'))return;
+  codes.splice(i,1);store('chg_codes',codes);renderCodes();
+}
+function renderCodes(){
+  var el=document.getElementById('code-list');
+  if(!el)return;
+  if(codes.length===0){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:10px;">No codes yet.</div>';return;}
+  el.innerHTML=codes.map(function(c,i){return '<div class="code-item"><div class="code-val">'+c.code+'</div><div class="code-used '+(c.used?'used':'active')+'">'+(c.used?'Used':'Active')+'</div><button class="btn-del" onclick="deleteCode('+i+')">&#10005;</button></div>';}).join('');
+}
+
+// MODULES
+function saveModuleStore(){store('chg_modules',modules);}
+function renderModules(){
+  var el=document.getElementById('modules-display');
+  if(!el)return;
+  if(modules.length===0){el.innerHTML='<div class="card" style="text-align:center;color:var(--muted);padding:26px;">No modules yet. Alexander will add them soon.</div>';return;}
+  el.innerHTML=modules.map(function(m,i){
+    var sc=m.status==='Available Now'?'var(--green)':m.status==='Updated'?'var(--gold)':'var(--muted)';
+    var si=m.status==='Available Now'?'&#10003;':m.status==='Updated'?'&#128,new;':'&#8987;';
+    return '<div class="mcard"><div class="mcard-header"><div class="micon">'+m.icon+'</div><div style="flex:1;"><div class="mcat">'+m.cat+'</div><div class="mtitle">'+m.title+'</div></div><div style="font-size:10.5px;font-weight:700;color:'+sc+';white-space:nowrap;">'+m.status+'</div></div><div class="mdesc">'+m.desc+'</div>'+(m.link?'<div style="margin-top:8px;"><a href="'+m.link+'" target="_blank" style="color:var(--pi-glow);font-size:12px;font-weight:600;">&#128206; Open Module &#8594;</a></div>':'')+'</div>';
+  }).join('');
+}
+function renderAdminModules(){
+  var el=document.getElementById('admin-module-list');
+  if(!el)return;
+  el.innerHTML=modules.map(function(m,i){return '<div class="module-item"><div class="module-top"><span>'+m.icon+'</span><span class="module-cat">'+m.cat+'</span><span class="module-title-disp">'+m.title+'</span><span style="font-size:10px;color:var(--muted);">'+m.status+'</span></div><div class="module-desc-disp">'+m.desc+'</div><div class="module-actions"><button class="btn-edit-mod" onclick="editModule('+i+')">&#9999;&#65039; Edit</button><button class="btn-del" onclick="deleteModule('+i+')">&#128465; Delete</button></div></div>';}).join('');
+}
+function editModule(i){
+  var m=modules[i];
+  document.getElementById('edit-mod-index').value=i;
+  document.getElementById('mod-title').value=m.title;
+  document.getElementById('mod-cat').value=m.cat;
+  document.getElementById('mod-icon').value=m.icon;
+  document.getElementById('mod-status').value=m.status;
+  document.getElementById('mod-desc').value=m.desc;
+  document.getElementById('mod-link').value=m.link||'';
+  document.getElementById('mod-form-title').textContent='Edit Module';
+  document.getElementById('mod-title').scrollIntoView({behavior:'smooth'});
+}
+function cancelEdit(){
+  document.getElementById('edit-mod-index').value=-1;
+  ['mod-title','mod-icon','mod-desc','mod-link'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('mod-cat').value='Foundational Training';
+  document.getElementById('mod-status').value='Available Now';
+  document.getElementById('mod-form-title').textContent='+ Add New Module';
+}
+function saveModule(){
+  var title=document.getElementById('mod-title').value.trim();
+  var desc=document.getElementById('mod-desc').value.trim();
+  if(!title||!desc){alert('Please enter a title and description.');return;}
+  var mod={icon:document.getElementById('mod-icon').value.trim()||'&#128196;',cat:document.getElementById('mod-cat').value,title:title,desc:desc,status:document.getElementById('mod-status').value,link:document.getElementById('mod-link').value.trim()};
+  var idx=parseInt(document.getElementById('edit-mod-index').value);
+  if(idx>=0){modules[idx]=mod;}else{modules.push(mod);}
+  saveModuleStore();renderAdminModules();cancelEdit();
+  alert(idx>=0?'Module updated!':'Module added!');
+}
+function deleteModule(i){
+  if(!confirm('Delete "'+modules[i].title+'"?'))return;
+  modules.splice(i,1);saveModuleStore();renderAdminModules();
+}
+
+// PAY METHODS
+function renderPayMethods(){
+  var el=document.getElementById('pay-method-list');
+  if(!el)return;
+  el.innerHTML=payMethods.map(function(m,i){return '<div class="pmi"><div class="pmflag">'+m.flag+'</div><div class="pminfo"><div class="pmname">'+m.service+'</div><div class="pmcountry">'+m.country+'</div><div class="pmnumber">'+m.number+'</div></div><button class="btn-remove" onclick="removePayMethod('+i+')">Remove</button></div>';}).join('');
+}
+function addPayMethod(){
+  var c=document.getElementById('new-country').value.trim();
+  var f=document.getElementById('new-flag').value.trim();
+  var s=document.getElementById('new-service').value.trim();
+  var n=document.getElementById('new-number').value.trim();
+  if(!c||!s||!n){alert('Please fill Country, Service and Number.');return;}
+  payMethods.push({flag:f||'&#127757;',country:c,service:s,number:n});
+  store('chg_pay',payMethods);renderPayMethods();
+  ['new-country','new-flag','new-service','new-number'].forEach(function(id){document.getElementById(id).value='';});
+}
+function removePayMethod(i){
+  if(!confirm('Remove '+payMethods[i].service+'?'))return;
+  payMethods.splice(i,1);store('chg_pay',payMethods);renderPayMethods();
+}
+
+// TABS & FORM
+function switchTab(name){
+  var names=['register','training','kyc','payment','access','hosting'];
+  names.forEach(function(n){
+    document.getElementById('tab-'+n).classList.toggle('active',n===name);
+    document.getElementById('panel-'+n).classList.toggle('active',n===name);
+  });
+  if(name==='training')renderModules();
+}
+function handleKYC(el){document.getElementById('wallet-section').classList.toggle('show',el.value==='yes');}
+function handlePay(el){
+  ['pi','mobile','sponsor'].forEach(function(t){var e=document.getElementById('pay-'+t+'-info');if(e)e.classList.remove('show');});
+  var tgt=document.getElementById('pay-'+el.value+'-info');if(tgt)tgt.classList.add('show');
+}
+function submitForm(){
+  var ok=document.getElementById('fname').value.trim()&&document.getElementById('lname').value.trim()&&document.getElementById('phone').value.trim()&&document.getElementById('piuser').value.trim()&&document.querySelector('input[name="kyc"]:checked')&&document.querySelector('input[name="pay"]:checked')&&document.getElementById('level').value;
+  if(!ok){alert('Please fill in all required fields.');return;}
+  document.getElementById('form-body').style.display='none';
+  document.getElementById('success-screen').classList.add('show');
+}
+function copyRef(){
+  navigator.clipboard.writeText('Chigalex1').then(function(){
+    var b=document.getElementById('rbtn');b.textContent='Copied!';setTimeout(function(){b.textContent='Copy Code';},2000);
+  }).catch(function(){alert('Referral code: Chigalex1');});
+}
+function copyAnn(){
+  var t=document.getElementById('ann-text').innerText;
+  navigator.clipboard.writeText(t).then(function(){alert('Copied! Paste into your WhatsApp group.');}).catch(function(){alert('Please select and copy the text manually.');});
+}
+
+// LANGUAGE
+var LANGS={
+  en:{lt:'Training Portal Access',ld:'This portal is for registered and paid pioneers only. Enter your unique access code provided by Alexander after payment confirmation.',h1t:'Pioneer Training & Education Portal',h1s:'Empowering African Pioneers to unlock, use and grow in the Pi ecosystem.',abt:'Complete the Training → Unlock the Full Hub',abd:'Every pioneer who completes the Chigalex1 training automatically unlocks free access to all further Hub trainings. Your US$10 is a one-time investment.'},
+  sn:{lt:'Pinda Portal yeKudzidzira',ld:'Iyi portal ndeye vanhu vakarejistra uye vakabhadhara chete. Isa code yako.',h1t:'Portal yeKudzidzira uye Dzidziso',h1s:'Kusimbidzira Vavambi veAfrica kushandisa Pi.',abt:'Pedza Dzidziso → Wana Zvinhu Zvese',abd:'Mumwe nomumwe anopedza dzidziso yeChigalex1 anowana kubindirwa mazuva ese.'},
+  nd:{lt:'Ngena i-Portal Yokufundisa',ld:'Le portal ilababhalisiwe futhi abakhokhile kuphela.',h1t:'I-Portal Yokufundisa Nokufunda',h1s:'Anikeza amaPioneer ase-Afrika amandla.',abt:'Qeda Ukufunda → Thola Ukufinyelela Konke',abd:'Wonke umuntu oqeda uhlelo lweChigalex1 uthola ukufinyelela okwengeziwe.'},
+  sw:{lt:'Ingia kwenye Portal ya Mafunzo',ld:'Portal hii ni kwa waanzilishi waliojisajili na kulipa tu.',h1t:'Portal ya Mafunzo na Elimu',h1s:'Kuwawezesha Waanzilishi wa Afrika.',abt:'Kamilisha Mafunzo → Fungua Hub Yote',abd:'Kila mtu anayekamilisha mafunzo ya Chigalex1 anapata ufikiaji wa bure.'},
+  fr:{lt:"Accès au Portail de Formation",ld:"Ce portail est réservé aux pionniers inscrits et ayant payé.",h1t:'Portail de Formation et Éducation',h1s:"Autonomiser les Pionniers d'Afrique.",abt:'Terminez la Formation → Débloquez le Hub Complet',abd:"Chaque pionnier qui termine la formation Chigalex1 obtient un accès gratuit à toutes les formations suivantes."},
+  pt:{lt:'Acesso ao Portal de Formação',ld:'Este portal é apenas para pioneiros registados e que pagaram.',h1t:'Portal de Formação e Educação',h1s:'Capacitando Pioneiros Africanos.',abt:'Conclua a Formação → Desbloqueie o Hub Completo',abd:'Cada pioneiro que conclui a formação Chigalex1 desbloqueia acesso gratuito.'},
+  zu:{lt:'Ngena ku-Portal Yokuqeqesha',ld:'Le portal ingeyabo ababhalisiwe futhi abakhokhile.',h1t:'I-Portal Yokuqeqesha Nokufunda',h1s:'Anikeza amaPioneer Amandla e-Afrika.',abt:'Qeda Uqeqesho → Thola Ukufinyelela Konke',abd:'Wonke umuntu oqeda uhlelo lweChigalex1 uthola ukufinyelela kwamaHub.'},
+  ha:{lt:'Shiga Tashar Horar da Mutane',ld:'Wannan tashar tana ga mahalarta da suka yi rajista kuma suka biya ne kawai.',h1t:'Tashar Horar da Mutane da Ilimi',h1s:'Karfafa Majagaba na Afirka.',abt:'Kammala Horo → Sami Duk Damar Hub',abd:'Duk wanda ya kammala horon Chigalex1 zai sami damar horo kyauta bayan haka.'}
+};
+function setLang(lang,btn){
+  var T=LANGS[lang]||LANGS.en;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  function s(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+  s('lt',T.lt);s('ld',T.ld);s('h1t',T.h1t);s('h1s',T.h1s);s('abt',T.abt);s('abd',T.abd);
+}
+
+// INIT
+renderCodes();
+renderPayMethods();
+renderModules();
+</script>
+</body>
+</html>
